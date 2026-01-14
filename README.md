@@ -15,7 +15,7 @@
 ## Installation
 
 ```bash
-pip install http-Wizz
+pip install http-wizz
 ```
 
 ---
