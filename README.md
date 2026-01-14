@@ -1,12 +1,12 @@
 # HTTP Wizz 🧙‍♂️
 
-**HTTP Wizz** is a powerful Python library designed for high-performance, rate-limited URL fetching. Whether you're scraping data, calling third-party APIs with strict limits, or building robust microservices, HTTP Wizz provides the tools to handle "requests per second" (RPS) constraints with ease.
+**HTTP Wizz** is a Python library designed for high-performance, rate-limited URL fetching. Whether you're scraping data, calling third-party APIs with strict limits, or building robust microservices, HTTP Wizz provides the tools to handle "requests per second" (RPS) constraints with ease.
 
 ## Key Features
 
 - ⏱️ **Strict Rate Limiting:** Precisely control your throughput with "requests per second" (RPS).
 - 🔄 **Automatic Retries:** Built-in resilience for flaky networks and unstable APIs.
-- 📈 **Exponential Backoff:** Intelligently space out retries to avoid overwhelming target servers.
+- 📈 **Exponential Backoff:** Space out retries to avoid overwhelming target servers.
 - 🎯 **Custom Retry Logic:** Force retries based on response content, even if the status code is `200 OK`.
 - 🪄 **Versatile API:** Choose between a simple sync function, a high-level async client, or a low-level `aiohttp` wrapper.
 
