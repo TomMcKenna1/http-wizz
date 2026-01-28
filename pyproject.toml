@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "http-wizz"
-version = "0.1.0"
+version = "1.0.0"
 description = "A powerful async library to fetch URLs with strict rate limiting (requests per second)."
 readme = "README.md"
 authors = [{ name = "Gemini User" }]
