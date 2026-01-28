@@ -49,7 +49,7 @@ class TestCustomRetry(unittest.TestCase):
         mock_session.__aexit__ = AsyncMock(return_value=None)
         
         with patch('aiohttp.ClientSession', return_value=mock_session):
-            with patch('http_wiz.client.RateLimiter.wait', new_callable=AsyncMock):
+            with patch('http_wizz.client.RateLimiter.wait', new_callable=AsyncMock):
                 with patch('asyncio.sleep', new_callable=AsyncMock):
                     results = asyncio.run(client.fetch_all(["http://api.com/status"]))
                     

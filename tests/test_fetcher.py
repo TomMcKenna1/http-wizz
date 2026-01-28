@@ -66,7 +66,7 @@ class TestRateLimitedFetcher(unittest.TestCase):
             # We patch asyncio.sleep to verify delays
             with patch('asyncio.sleep', new_callable=AsyncMock) as mock_sleep:
                 # We also need to patch RateLimiter.wait to avoid rate limit sleeps interfering (though RPS=1000 is fast)
-                with patch('http_wiz.client.RateLimiter.wait', new_callable=AsyncMock):
+                with patch('http_wizz.client.RateLimiter.wait', new_callable=AsyncMock):
                     asyncio.run(client.fetch_all(["http://fail.com"]))
                     
                     # Sleeps for retries: 0.1, 0.1
@@ -94,7 +94,7 @@ class TestRateLimitedFetcher(unittest.TestCase):
         
         with patch('aiohttp.ClientSession', return_value=mock_session_inst):
             with patch('asyncio.sleep', new_callable=AsyncMock) as mock_sleep:
-                with patch('http_wiz.client.RateLimiter.wait', new_callable=AsyncMock):
+                with patch('http_wizz.client.RateLimiter.wait', new_callable=AsyncMock):
                     asyncio.run(client.fetch_all(["http://fail.com"]))
                     
                     # Sleeps: 0.1, 0.2
