@@ -1,162 +1,117 @@
 # HTTP Wizz 🧙‍♂️
 
-**HTTP Wizz** is a Python library designed for high-performance, asynchronous, rate-limited URL fetching. Whether you're scraping data, calling third-party APIs with strict limits, or building robust microservices, HTTP Wizz provides the tools to handle "requests per second" (RPS) constraints with ease.
+![PyPI - Version](https://img.shields.io/pypi/v/http-wizz)
+![PyPI - License](https://img.shields.io/pypi/l/http-wizz)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/http-wizz)
+![Tests](https://github.com/tommckenna1/http-wizz/actions/workflows/tests.yml/badge.svg)
 
-## Key Features
+**The missing rate-limit wrapper for `aiohttp` and `asyncio`.**
 
-- ⏱️ **Strict Rate Limiting:** Precisely control your throughput with "requests per second" (RPS).
-- 🌍 **Domain-Specific Limits:** Set different rate limits for different domains (e.g., fast for your API, slow for scraping).
-- 💥 **Burst Handling:** Allow short bursts of traffic while maintaining long-term rate limits.
-- 🔄 **Automatic Retries:** Built-in resilience for flaky networks and unstable APIs.
-- ⏳ **Smart Backoff:** Respects standard `Retry-After` headers and supports exponential backoff.
-- 🎯 **Custom Retry Logic:** Force retries based on response content, even if the status code is `200 OK`.
-- 📊 **Progress Monitoring:** Built-in integration with `tqdm` for progress bars.
-- 🪄 **Versatile API:** Choose between a simple sync function, a high-level async client, or a low-level `aiohttp` wrapper.
+**HTTP Wizz** handles the hard parts of web scraping and high-volume API consumption: **Strict Rate Limiting (RPS)**, **Automatic Retries**, **429/503 Backoff**, and **Domain Throttling**. Perfect for web crawlers, data processing pipelines, and microservices.
 
 ---
 
-## Installation
+## ⚡ Why HTTP Wizz?
+
+Whether you are building a **web scraper** or a **data pipeline** (e.g., geocoding 100k addresses), hitting rate limits is the #1 cause of failure. `asyncio.gather` is too aggressive, and `requests` is too slow.
+
+| Feature | `requests` | `aiohttp` (raw) | `http-wizz` 🧙‍♂️ |
+| :--- | :---: | :---: | :---: |
+| **Async / Non-blocking** | ❌ | ✅ | ✅ |
+| **Strict Rate Limiting (RPS)** | ❌ | ❌ | ✅ |
+| **Handle `Retry-After` Header** | ❌ | ❌ | ✅ |
+| **Domain-Specific Limits** | ❌ | ❌ | ✅ |
+| **Auto-Retries with Backoff** | ❌ | ❌ | ✅ |
+| **Data Pipeline Friendly** | ❌ | ⚠️ | ✅ |
+
+---
+
+## 🚀 Installation
 
 ```bash
 pip install http-wizz
 ```
-
-*(Optional) For progress bar support:*
-```bash
-pip install tqdm
-```
+*(Optional) For progress bars:* `pip install tqdm`
 
 ---
 
-## Usage Guide
+## 📖 Recipes & Examples
 
-### 1. The Simple Way (Synchronous)
-Perfect for quick scripts. Use `fetch_urls` to get results immediately without `asyncio` boilerplate.
+Check out the `examples/` directory for ready-to-run scripts:
+
+- **[Data Pipeline](examples/data_pipeline_geocoding.py):** Process batches of data at a fixed speed.
+- **[Hacker News Scraper](examples/hacker_news_scraper.py):** Fetch top stories politely.
+- **[Strict API Consumer](examples/strict_api_consumer.py):** Handle APIs with tight limits (e.g., 2 RPS).
+- **[Benchmark](examples/benchmark_comparison.py):** Compare Wizz vs Sequential vs Naive Async.
+
+---
+
+## 📚 API Reference
+
+For a complete list of all parameters, flags, and advanced options, please see the [**Full API Reference**](docs/API_REFERENCE.md).
+
+## 🛠 Usage Guide
+
+### 1. Batch Processing (The Simple Way)
+Perfect for data processing pipelines where you just want to "fire and forget" a list of tasks at a safe speed.
 
 ```python
 from http_wizz import fetch_urls
 
-urls = [f"https://api.example.com/data/{i}" for i in range(10)]
+urls = [f"https://api.geocoder.com/search?q={addr}" for addr in my_addresses]
 
-# Fetch at 5 requests per second with a progress bar
-results = fetch_urls(urls, requests_per_second=5, show_progress=True)
+# Process 1,000 items at exactly 20 requests per second
+results = fetch_urls(urls, requests_per_second=20, show_progress=True)
 ```
 
-### 2. The Wizard Way (Async Client)
-Best for async applications. `WizzClient` handles rate limiting, retries, and JSON parsing automatically.
+### 2. High-Performance Async Client
+Best for modern async applications and microservices.
 
 ```python
 import asyncio
 from http_wizz import WizzClient
 
 async def main():
-    urls = ["https://api.example.com/item/1", "https://api.example.com/item/2"]
-    
-    # Use as a context manager for proper cleanup
-    async with WizzClient(requests_per_second=10) as client:
-        results = await client.fetch_all(urls)
-        print(f"Fetched {len(results)} results")
-
-asyncio.run(main())
+    # 50 RPS limit for high-throughput pipelines
+    async with WizzClient(requests_per_second=50, burst_size=10) as client:
+        results = await client.fetch_all(["https://api.com/task/1", ...])
 ```
 
 ### 3. The Power User Way (`RateLimitedSession`)
-A drop-in replacement for `aiohttp.ClientSession`. Use this when you need full control over headers, cookies, or different HTTP methods (POST, PUT, etc.).
+A drop-in replacement for `aiohttp.ClientSession`. Use this for full control (headers, cookies, POST/PUT methods, etc.).
 
 ```python
-import asyncio
 from http_wizz import RateLimitedSession
 
-async def main():
-    async with RateLimitedSession(requests_per_second=2) as session:
-        for i in range(5):
-            # Supports .get, .post, .put, .delete, etc.
-            async with session.get(f"https://httpbin.org/get?id={i}") as resp:
-                data = await resp.json()
-                print(f"Status {resp.status}: {data.get('args')}")
-
-asyncio.run(main())
+async with RateLimitedSession(requests_per_second=5) as session:
+    async with session.post("https://api.com/update", json={"id": 123}) as resp:
+        status = await resp.json()
 ```
 
 ---
 
-## Advanced Configuration
+## 👮 API Compliance & Politeness
 
-### Domain-Specific Throttling
-You can set a global rate limit and specific limits for certain domains.
+HTTP Wizz ensures your application remains a "Good Citizen" and avoids IP bans:
+
+1.  **Respects `Retry-After`:** If a service (like Google or AWS) replies with a `Retry-After` header, HTTP Wizz automatically pauses for the required duration.
+2.  **Smoothing:** Uses a Token Bucket algorithm to ensure your traffic is consistent, not spikey, which is key for staying within API quotas.
+3.  **Domain Throttling:** Manage multiple services with different quotas simultaneously:
 
 ```python
-from http_wizz import WizzClient
-
 client = WizzClient(
-    requests_per_second=10,  # Default limit for most domains
+    requests_per_second=10, 
     domain_limits={
-        "slow-api.com": 1,   # Very strict limit for this domain
-        "fast-cdn.com": 50   # High throughput for this domain
+        "maps.google.com": 50,  # High quota
+        "legacy-service.local": 1 # Very fragile service
     }
 )
 ```
 
-### Burst Handling
-Allow small bursts of requests to go through instantly before throttling kicks in. This makes the client feel more responsive for small batches.
-
-```python
-client = WizzClient(
-    requests_per_second=5,
-    burst_size=10  # Allow up to 10 requests immediately
-)
-```
-
-### Configuring Retries and Backoff
-`WizzClient` automatically respects `Retry-After` headers (both seconds and dates). You can further customize the behavior:
-
-```python
-client = WizzClient(
-    requests_per_second=5,
-    max_retries=5,              # Number of retry attempts
-    initial_retry_delay=1.0,    # Seconds to wait after first failure
-    exponential_backoff=True    # Double the delay after each failure (1s, 2s, 4s...)
-)
-```
-
-### Custom Retry Conditions
-Sometimes APIs return `200 OK` but include an error message in the body. You can force a retry by providing a `should_retry` callback.
-
-```python
-def check_for_api_errors(response, content):
-    # Retry if the API returned a 'try_again' flag in the JSON body
-    return isinstance(content, dict) and content.get("status") == "try_again"
-
-results = fetch_urls(
-    ["https://api.example.com/job"],
-    should_retry=check_for_api_errors,
-    max_retries=10
-)
-```
-
 ---
 
-## API Reference
+## 🤝 Contributing
 
-### `fetch_urls(...)`
-- `urls`: List of strings.
-- `requests_per_second`: (float) Max requests/sec. Default `10`.
-- `burst_size`: (int) Max concurrent burst. Default `1`.
-- `domain_limits`: (dict) Map of domain string to RPS float.
-- `max_retries`: (int) Default `5`.
-- `initial_retry_delay`: (float) Default `1.0`.
-- `exponential_backoff`: (bool) Default `True`.
-- `should_retry`: `callable(response, content) -> bool`.
-- `show_progress`: (bool) Show a tqdm progress bar. Default `False`.
+We love pull requests! If you have a feature idea or found a bug, please open an issue.
 
-### `WizzClient(...)`
-- High-level async client. Same arguments as `fetch_urls` (excluding `urls` and `show_progress` in init).
-- `fetch_all(urls, show_progress=False)`: Asynchronously fetches all provided URLs.
-
-### `RateLimitedSession(...)`
-- `requests_per_second`: (float) Max requests/sec.
-- `burst_size`: (int) Max concurrent burst.
-- `domain_limits`: (dict) Map of domain string to RPS float.
-- All other arguments are passed to the underlying `aiohttp.ClientSession`.
-
----
+**License:** MIT

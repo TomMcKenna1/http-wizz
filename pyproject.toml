@@ -5,12 +5,25 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "http-wizz"
 version = "1.0.0"
-description = "A powerful async library to fetch URLs with strict rate limiting (requests per second)."
+description = "The missing rate-limit wrapper for aiohttp. Effortlessly handle 429s, Retry-After headers, and domain throttling for scraping and data pipelines."
 readme = "README.md"
 authors = [{ name = "Gemini User" }]
 license = { text = "MIT" }
+keywords = ["api-client", "data-pipeline", "batch-processing", "geocoding", "web-scraping", "rate-limit", "backoff", "throttling", "aiohttp", "asyncio", "token-bucket", "retry-after", "429"]
 classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Internet :: WWW/HTTP :: Indexing/Search",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Framework :: AsyncIO",
     "Operating System :: OS Independent",
 ]
 dependencies = [
@@ -20,6 +33,8 @@ requires-python = ">=3.7"
 
 [project.urls]
 "Homepage" = "https://github.com/tommckenna1/http-wizz"
+"Bug Tracker" = "https://github.com/tommckenna1/http-wizz/issues"
+"Source Code" = "https://github.com/tommckenna1/http-wizz"
 
 [tool.setuptools.packages.find]
 where = ["src"]
