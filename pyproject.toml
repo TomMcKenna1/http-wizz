@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "http-wizz"
-version = "1.0.1"
+version = "1.0.2"
 description = "The missing rate-limit wrapper for aiohttp. Effortlessly handle 429s, Retry-After headers, and domain throttling for scraping and data pipelines."
 readme = "README.md"
 authors = [{ name = "Gemini User" }]
